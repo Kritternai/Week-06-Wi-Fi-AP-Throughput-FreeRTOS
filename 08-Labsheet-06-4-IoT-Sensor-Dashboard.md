@@ -81,14 +81,15 @@ xSemaphoreGive(mutex)           xSemaphoreGive(mutex)
 
 1. Build และ Flash โค้ดลงบอร์ด ESP32
 2. เปิด Serial Monitor ดู SSID และยืนยัน `[HTTP SERVER]: Started`
-3. ใช้มือถือ **เชื่อมต่อ Wi-Fi ชื่อ `MY_ESP32_SENSOR_AP`** (Password: `12345678`)
+3. ใช้มือถือ **เชื่อมต่อ Wi-Fi ชื่อ `MY_ESP32_SENSOR_AP_011`** (Password: `12345678`)
 4. เปิด Browser บนมือถือ แล้วไปที่ `http://192.168.4.1`
 5. ควรเห็นหน้า Dashboard แสดง Temperature / Humidity / Light Lux และ Auto-refresh ทุก 2 วินาที
 6. ทดสอบ JSON API โดยเปิด `http://192.168.4.1/api/data` ดู Raw JSON
 
 ตัวอย่างหน้า browser
-![](images/253776.jpg)
-
+<p align="center">
+  <img src="./images/4dashboard.png" width="400">
+</p>
 
 ---
 
@@ -98,16 +99,16 @@ xSemaphoreGive(mutex)           xSemaphoreGive(mutex)
 
 | ครั้งที่ | Temperature (°C) | Humidity (%) | Light Lux | Timestamp (ms) |
 | :------: | :--------------: | :----------: | :-------: | :------------: |
-|  **1**   |                  |              |           |                |
-|  **2**   |                  |              |           |                |
-|  **3**   |                  |              |           |                |
+|  **1**   |      34.50       |    67.50     |    486    |      2210      |
+|  **2**   |      33.40       |    67.80     |    486    |      3720      |
+|  **3**   |      31.00       |    66.10     |    374    |      5230      |
 
 ### 7.2 ทดสอบ JSON API (`/api/data`)
 
 บันทึก Raw JSON Response จาก Browser:
 
 ```json
-
+{"temperature":33.20,"humidity":69.00,"light_lux":208,"timestamp_ms":70150}
 ```
 
 ---
@@ -115,8 +116,14 @@ xSemaphoreGive(mutex)           xSemaphoreGive(mutex)
 ## 8. คำถามท้ายการทดลอง (Post-Lab Questions)
 
 1. เหตุใดจึงต้องใช้ **Mutex** ในการป้องกันการเข้าถึงตัวแปร `g_latest_data` ร่วมกันระหว่าง `vNetworkTask` และ HTTP Handler? ถ้าไม่ใช้จะเกิดอะไรขึ้น?
+> **ตอบ:** ต้องใช้เพื่อป้องกันปัญหา Torn Read (Race Condition) เพราะข้อมูลขนาดใหญ่เวลาถูกเขียนอาจจะยังไม่เสร็จดี (เช่น เขียนอุณหภูมิเสร็จแล้ว แต่ความชื้นยังไม่อัปเดต) ถ้าไม่มี Mutex ฝั่ง HTTP Handler อาจจะแอบเข้ามาอ่านข้อมูลตรงกลางคัน ทำให้ผู้ใช้ได้ข้อมูลใหม่ผสมกับข้อมูลเก่าที่ไม่สมบูรณ์ไปแสดงผลครับ
+
 2. `esp_http_server` รัน Handler บน Thread ใด — เป็น Thread เดียวกับ FreeRTOS Task ของเราหรือไม่?
+> **ตอบ:** ไม่ใช่ครับ `esp_http_server` จะสร้าง Background Thread (Task) ของตัวเองแยกต่างหากเพื่อรอรับ Request ดังนั้น HTTP Handler จึงทำงานคนละ Thread กับ `vSensorTask` และ `vNetworkTask` ของเรา นี่คือเหตุผลว่าทำไมถึงต้องมี Mutex มาช่วยคุ้มกันตอนข้าม Thread ครับ
+
 3. การที่ Dashboard ใช้ `<meta http-equiv="refresh" content="2">` แทนที่จะใช้ JavaScript `fetch()` มีข้อดีและข้อเสียอย่างไร?
+> **ตอบ:** **ข้อดี:** ง่ายมาก ไม่ต้องเขียน JavaScript แม้แต่บรรทัดเดียว โค้ด HTML สั้นกะทัดรัด
+> **ข้อเสีย:** หน้าเว็บจะถูกโหลดใหม่ (Refresh) ทั้งหน้าทุกๆ 2 วินาที ทำให้จอกระพริบ เปลือง Bandwidth Wi-Fi เพราะต้องโหลดแท็ก HTML ใหม่ทั้งหมดทุกครั้ง เทียบกับใช้ `fetch()` ที่โหลดเฉพาะตัวเลข Data ทำให้เนียนและลื่นกว่าเยอะครับ
 
 ---
 
