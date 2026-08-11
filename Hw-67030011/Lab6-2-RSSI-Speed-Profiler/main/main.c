@@ -145,21 +145,36 @@ static void perform_throughput_test(int benchmark_round)
 
 static void profiler_task(void *arg)
 {
-    for (int round = 1; round <= BENCHMARK_ROUNDS; round++) {
-        EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group,
-                                                WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
-                                                pdFALSE,
-                                                pdFALSE,
-                                                portMAX_DELAY);
-        if ((bits & WIFI_FAIL_BIT) != 0) {
-            ESP_LOGE(TAG, "Cannot connect to %s; profiler stopped", AP_SSID);
-            break;
-        }
+    int8_t tx_power_levels[] = {78, 60, 40, 20, 8}; // 20, 15, 10, 5, 2 dBm
+    int num_levels = sizeof(tx_power_levels)/sizeof(tx_power_levels[0]);
 
-        perform_throughput_test(round);
-        vTaskDelay(pdMS_TO_TICKS(2000));
+    for (int l = 0; l < num_levels; l++) {
+        int8_t power = tx_power_levels[l];
+        ESP_ERROR_CHECK(esp_wifi_set_max_tx_power(power));
+        int dbm_val = (power == 78) ? 20 : (power / 4);
+        
+        ESP_LOGI(TAG, "=======================================================");
+        ESP_LOGI(TAG, "[STARTING TEST SUITE] Tx Power: %d dBm (Level %d)", dbm_val, power);
+        ESP_LOGI(TAG, "=======================================================");
+
+        for (int round = 1; round <= BENCHMARK_ROUNDS; round++) {
+            EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group,
+                                                    WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
+                                                    pdFALSE,
+                                                    pdFALSE,
+                                                    portMAX_DELAY);
+            if ((bits & WIFI_FAIL_BIT) != 0) {
+                ESP_LOGE(TAG, "Cannot connect to %s; profiler stopped", AP_SSID);
+                goto end_test;
+            }
+
+            perform_throughput_test(round);
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+        vTaskDelay(pdMS_TO_TICKS(3000)); // Pause between power levels
     }
 
+end_test:
     ESP_LOGI(TAG, "All benchmark rounds completed");
     vTaskDelete(NULL);
 }
@@ -205,6 +220,8 @@ static void wifi_init_sta(void)
 
     ESP_LOGI(TAG, "[FORENSIC]: Call esp_wifi_set_config(WIFI_IF_STA, &wifi_config)");
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+
+
 
     ESP_LOGI(TAG, "[FORENSIC]: Call esp_wifi_start()");
     ESP_ERROR_CHECK(esp_wifi_start());
