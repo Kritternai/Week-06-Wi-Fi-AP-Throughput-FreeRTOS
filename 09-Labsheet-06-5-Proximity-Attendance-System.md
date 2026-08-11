@@ -36,7 +36,7 @@ sequenceDiagram
     participant RTOS as FreeRTOS Queue / Task
     participant Monitor as Instructor Dashboard
 
-    Student->>AP: 1. เชื่อมต่อ Wi-Fi "CLASSROOM_ATTENDANCE_AP"
+    Student->>AP: 1. เชื่อมต่อ Wi-Fi "CLASSROOM_ATTENDANCE_AP_011"
     AP->>RTOS: 2. ดักจับ Event: สกัด MAC Address + วัด RSSI
     
     alt กรณี RSSI > -55 dBm (อยู่ในรัศมีโต๊ะทดลอง)
@@ -68,7 +68,7 @@ sequenceDiagram
 
 static const char *TAG = "SMART_ATTENDANCE";
 
-#define AP_SSID          "CLASSROOM_ATTENDANCE_AP"
+#define AP_SSID          "CLASSROOM_ATTENDANCE_AP_011"
 #define AP_PASS          "12345678"
 #define RSSI_THRESHOLD   -60  // dBm threshold for proximity check
 
@@ -193,5 +193,10 @@ void app_main(void) {
 ## 6. คำถามท้ายการทดลอง (Post-Lab Questions)
 
 1. การใช้ **RF Signal Proximity (RSSI)** ร่วมกับ **HTTP Web Server** บน ESP32 แก้ปัญหาการฝากเช็กชื่อแทนกันในห้องเรียนได้อย่างไร?
+> **ตอบ:** นักศึกษาต้องเชื่อมต่อ Wi-Fi และกดเช็กชื่อผ่าน Web Server แต่ระบบจะมีการตรวจสอบค่า RSSI ของสมาร์ตโฟนเครื่องนั้นด้วย หากนักศึกษาไม่ได้อยู่ในห้องเรียน (สัญญาณอ่อนกว่าเกณฑ์ที่ตั้งไว้) ระบบก็จะไม่อนุญาตให้เช็กชื่อได้แม้จะรู้รหัส Wi-Fi ก็ตาม ทำให้ต้องนำโทรศัพท์เข้ามาอยู่ในรัศมีของ ESP32 เท่านั้น
+
 2. เหตุใดระดับเกณฑ์ RSSI ที่ `-55 dBm` จึงเหมาะสมสำหรับการระบุตำแหน่งอุปกรณ์ให้อยู่ภายในรัศมีโต๊ะปฏิบัติการ?
+> **ตอบ:** ค่า RSSI ที่ระดับ -55 dBm เป็นสัญญาณที่ค่อนข้างแรง มักจะหมายถึงอุปกรณ์อยู่ห่างจาก ESP32 ในระยะใกล้มาก (ประมาณ 1-3 เมตร) ซึ่งครอบคลุมระยะของโต๊ะปฏิบัติการพอดี หากออกนอกห้องเรียนสัญญาณจะตกลงต่ำกว่านี้ (เช่น -70 dBm ขึ้นไป) จึงเป็นเกณฑ์ที่ดีในการแยกแยะ
+
 3. หากต้องการต่อยอดมินิโปรเจกต์นี้ในอนาคต ให้สามารถบันทึกข้อมูลการเข้าเรียนลงระบบ Cloud (เช่น Google Sheets หรือ Firebase) จะต้องเพิ่มส่วนเชื่อมต่อใดบ้าง?
+> **ตอบ:** จะต้องเปลี่ยนให้ ESP32 ทำหน้าที่เป็น Station (STA) เพื่อเชื่อมต่ออินเทอร์เน็ตผ่าน Wi-Fi ของมหาวิทยาลัยหรือ Hotspot จากนั้นใช้ไลบรารี `esp_http_client` หรือ MQTT เพื่อทำการส่งข้อมูล HTTP POST/GET เอาข้อมูลการเช็กชื่อขึ้นไปเก็บบนฐานข้อมูล Cloud ต่อไป
