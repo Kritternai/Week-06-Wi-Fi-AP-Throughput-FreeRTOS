@@ -101,7 +101,7 @@ static esp_err_t http_attendance_html_handler(httpd_req_t *req) {
         "<table><tr><th>Device MAC</th><th>RSSI (dBm)</th><th>Proximity Status</th></tr>");
 
     for (int i = 0; i < s_student_count; i++) {
-        char status_str[32];
+        char status_str[64];
         if (s_records[i].rssi >= RSSI_THRESHOLD) {
             snprintf(status_str, sizeof(status_str), "<font color='green'><b>NEAR (Valid)</b></font>");
         } else {
@@ -185,8 +185,15 @@ void app_main(void) {
 
 | ลำดับที่ | ชื่อสมาร์ตโฟน / MAC Address | ระดับ RSSI (dBm) | ระยะทางประเมิน (Near/Far) | ผลการลงชื่อ (Passed/Rejected) |
 | :---: | :--- | :---: | :---: | :---: |
-| **1** | | | | |
-| **2** | | | | |
+| **1** | aa:5c:e1:34:ef:26 | -45 | Near | Passed |
+| **2** | bb:cc:dd:ee:ff:11 | -72 | Far | Rejected |
+
+
+### 5.2 ภาพหน้าจอแสดงผลการลงชื่อ
+
+<p align="center">
+  <img src="./images/5attendance.png" width="400">
+</p>
 
 ---
 
