@@ -166,8 +166,13 @@ void app_main(void) {
 
 | ชื่อ FreeRTOS Task | ขนาด Stack ที่กำหนดใน `xTaskCreate` (Bytes) | ค่า High Water Mark ที่อ่านได้ (Words / Bytes) | สถานะความปลอดภัยสแตก |
 | :--- | :---: | :---: | :---: |
-| **`SensorCollectorTask`** | 3072 | | |
-| **`NetworkCommTask`** | 4096 | | |
+| **`SensorCollectorTask`** | 4096 | 3052 Bytes | ปลอดภัยมาก |
+| **`NetworkCommTask`** | 4096 | 3080 Bytes | ปลอดภัยมาก |
+
+**รูปภาพที่ 3:** ตัวอย่างผลการมอนิเตอร์การทำงานของ Sensor Task และ Network Task ผ่าน FreeRTOS Queue
+<p align="center">
+  <img src="./images/3termsnap.png" width="800">
+</p>
 
 ---
 
