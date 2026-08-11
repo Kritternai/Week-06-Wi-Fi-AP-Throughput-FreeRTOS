@@ -39,6 +39,18 @@
   <img src="./images/2termsnap.png" width="800">
 </p>
 
+**กราฟการวิเคราะห์ผล RSSI vs Throughput & Regression Model**
+<p align="center">
+  <img src="./images/lab6_2_rssi_vs_throughput.png" width="800">
+</p>
+<p align="center">
+  <img src="./images/lab6_2_tx_power_impact.png" width="800">
+</p>
+<p align="center">
+  <img src="./images/lab6_2_complete_rssi_profile.png" width="800">
+</p>
+
+
 **คำถามท้ายการทดลอง**
 1. เมื่อลดระดับ Tx Power ลงจาก 20 dBm เหลือ 2 dBm ค่า RSSI ลดลงกี่ dBm และส่งผลต่อความเร็ว Throughput อย่างไร?
 > **ตอบ:** จากผลการทดลองจริงพบว่า ค่า RSSI ลดลงเพียงเล็กน้อย (จาก -37.2 เป็น -39.7 dBm) เนื่องจากบอร์ดวางอยู่ใกล้กันมาก แต่ความเร็ว Throughput กลับ "เพิ่มขึ้น" (จาก 2749 Kbps เป็น 3705 Kbps) เมื่อลดกำลังส่งลง สาเหตุหลักเกิดจากการลดสัญญาณกวนกันเอง (Self-interference) หรืออาการ Signal Saturation ที่ภาครับ (Receiver) มักจะรับสัญญาณได้แย่ลงเมื่อถูกอัดด้วย Tx Power ที่แรงเกินไปในระยะประชิด

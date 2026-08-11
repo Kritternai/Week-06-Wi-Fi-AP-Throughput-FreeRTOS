@@ -78,12 +78,47 @@ sequenceDiagram
 
 ## 6. งานวิเคราะห์ข้อมูลเชิงสถิติ (Data Science & Regression Task)
 
-ให้นักศึกษานำค่า **RSSI (x-axis)** และ **Throughput (y-axis)** จากตารางทดลองไปสร้างแผนภาพใน Excel หรือ Python (Jupyter Notebook):
+### 6.1 แผนภาพ Scatter Plot และสมการถดถอย (RSSI vs Throughput)
 
-1. สร้างแผนภาพ **Scatter Plot** แสดงจุดข้อมูลระหว่าง RSSI กับ Speed
-2. สร้างเส้นแนวโน้ม **Trendline / Regression Curve** (เช่น Logarithmic Regression: $y = a \cdot \ln(x) + b$)
-3. คำนวณค่า **$R^2$ (Coefficient of Determination)** เพื่อประเมินความแม่นยำของสมการ
-4. ระบุจุด **Threshold RSSI (dBm)** ที่ความเร็วเริ่มลดลงมากกว่า 50% จากระดับสูงสุด
+<p align="center">
+  <img src="./images/lab6_2_rssi_vs_throughput.png" width="720" alt="RSSI vs Throughput Scatter Plot">
+</p>
+
+* **Linear Model**: $\text{Throughput} = -339.22 \times \text{RSSI} - 9848.71 \quad (R^2 = 0.978)$
+* **Polynomial Model (2nd deg)**: $\text{Throughput} = -36.45 \times \text{RSSI}^2 - 3153.32 \times \text{RSSI} - 64117.76 \quad (R^2 = 0.984)$
+
+---
+
+### 6.2 ผลกระทบของ Tx Power ต่อ Throughput
+
+<p align="center">
+  <img src="./images/lab6_2_tx_power_impact.png" width="720" alt="Tx Power Impact">
+</p>
+
+* **Signal Saturation Zone**: การตั้งค่า Tx Power สูงสุด (**20 dBm**) ในระยะประชิด ทำให้เกิดสัญญาณกวนตัวเอง ความเร็วตกเหลือ **2,749.90 Kbps**
+* **Optimal Zone**: เมื่อลด Tx Power ลงเหลือ **10 dBm – 2 dBm** ความเร็วเพิ่มขึ้นเป็น **3,682.81 – 3,705.92 Kbps** (+34.7%)
+
+---
+
+### 6.3 Wi-Fi Characteristic Curve & Threshold RSSI
+
+<p align="center">
+  <img src="./images/lab6_2_complete_rssi_profile.png" width="720" alt="Wi-Fi Characteristic Curve">
+</p>
+
+* **Maximum Throughput**: $\approx 3,750\text{ Kbps}$
+* **50% Threshold Speed**: $1,875\text{ Kbps}$
+* **Threshold RSSI**: $\mathbf{-83.5\text{ dBm}}$ *(จุดที่ความเร็วเริ่มลดลงมากกว่า 50% จากระดับสูงสุด)*
+
+---
+
+### 6.4 การทดสอบความเสถียร 10 รอบ (Automated Benchmark)
+
+<p align="center">
+  <img src="./images/lab6_2_10round_benchmark_stability.png" width="720" alt="10-Round Benchmark Stability">
+</p>
+
+* **Throughput เฉลี่ย**: **$6,022.5\text{ Kbps}$** (ค่า SD $\approx 423.8\text{ Kbps}$)
 
 ---
 
