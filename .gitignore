@@ -4,3 +4,15 @@
 build/**
 build-v6/**
 .esp/**
+
+# ESP-IDF specific
+**/sdkconfig
+**/sdkconfig.old
+**/dependencies.lock
+**/managed_components/
+
+# OS specific
+**/.DS_Store
+
+# IDEs
+**/.vscode/
